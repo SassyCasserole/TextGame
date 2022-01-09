@@ -1,0 +1,52 @@
+main_character:
+  name: Main Character
+  text: 'I am me as you are you and we are all together'
+  text_priority: 100
+  image: '@'
+  collision:
+    - 2
+    - 3
+    - 5
+  id: 1
+
+computer:
+  name: Computer
+  text: 'I Love You, Erin!'
+  text_priority: 50
+  image: '='
+  collision:
+    - 1
+    - 3
+    - 5
+  id: 2
+
+wall:
+  name: Wall
+  text: 'Ouch, thats a wall!'
+  text_priority: 90
+  image: 'X'
+  collision:
+    - 1
+    - 2
+    - 5
+  id: 3
+
+space:
+  name: Space
+  text: ''
+  text_priority: 99
+  image: ' '
+  collision:
+    -
+  id: 4
+
+babe:
+  name: Babe
+  text: 'Hi! My name is Cassandra, what is your name?'
+  text_priority: 60
+  image: '&'
+  collision:
+    - 1
+    - 2
+    - 3
+  id: 5

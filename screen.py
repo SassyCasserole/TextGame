@@ -1,6 +1,7 @@
-from character import CHAR_TO_CHARACTER_MAPPING, MainCharacter
+from character import CHARACTERS, MainCharacter
 from positionable import Coordinate
 from errors import CollisionError, GameError
+from priority_display_queue import PriorityDisplayQueue
 from text import HelpText, LOWEST_PRIORITY
 
 
@@ -26,6 +27,7 @@ class Cell(Coordinate):
         try:
             im = self.stack[-1].image
         except IndexError:
+            # hack
             im = '.'
         return im
 
@@ -111,7 +113,7 @@ class Screen:
         return self.grid.get_image(min_x, max_x, min_y, max_y)
 
     def get_current_image(self):
-        return self.get_subset_image(40, 18)
+        return self.get_subset_image(50, 20)
 
     def set_center(self, x, y):
         self.center_x = x
@@ -138,11 +140,14 @@ class Screen:
                 if char == '\n':
                     pass
                 else:
-                    positionable_class = CHAR_TO_CHARACTER_MAPPING[char]
-                    positionable = positionable_class(x, y)
-                    self.grid.apply(Cell.add_positionable, positionable)
-                    if isinstance(positionable, MainCharacter):
-                        val = positionable
+                    character = CHARACTERS.get_character_from_char(char)
+                    character.x = x
+                    character.y = y
+
+                    self.grid.apply(Cell.add_positionable, character)
+                    print(character)
+                    if isinstance(character, MainCharacter):
+                        val = character
         if not val:
             raise GameError("No Main Character")
         return val
@@ -171,35 +176,3 @@ class Screen:
     def reset(self):
         self._display_queue.reset()
         self._display_queue.add(HelpText.CONTROLS_TEXT.value)
-
-
-class PriorityDisplayQueue:
-
-    def __init__(self, new_entry):
-        self._entries = [new_entry]
-
-    def add(self, new_entry):
-        if not self._entries:
-            self._entries.append(new_entry)
-        else:
-            if new_entry.text:
-                for i, entry in enumerate(self._entries):
-                    print(entry)
-                    if new_entry.priority <= entry.priority:
-                        self._entries.insert(i, new_entry)
-                        break
-
-    def reset(self):
-        self._entries = []
-
-    def highest(self):
-        return self._entries[0]
-
-    def lowest(self):
-        return self._entries[-1]
-
-    def __getitem__(self, item):
-        return self._entries[item]
-
-    def __repr__(self):
-        return str([entry for entry in self._entries])

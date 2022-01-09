@@ -1,5 +1,5 @@
+import yaml
 from positionable import Positionable
-from text import HelpText
 
 
 class Character(Positionable):
@@ -8,76 +8,31 @@ class Character(Positionable):
         self.move(command.offset_x, command.offset_y)
 
 
-class Space(Character):
-
-    def __init__(self, x, y):
-        self.image = SPACE_CHAR
-        super(Space, self).__init__(x, y)
-
-
-class Wall(Character):
-
-    def __init__(self, x, y):
-        self.image = WALL_CHAR
-        super(Wall, self).__init__(x, y)
-
-    def interact(self, character):
-        return HelpText.WALL_TEXT.value
-
-
 class MainCharacter(Character):
 
-    def __init__(self, x, y):
-        self.image = MC_CHAR
-        super(MainCharacter, self).__init__(x, y)
+    pass
 
 
-class ComputerCharacter(Character):
+class Characters:
 
-    COLLISION_LIST = []
+    def __init__(self):
+        self.MainCharacter = None
+        self._characters_by_image = {}
+        self._load_characters('characters.yaml')
 
-    def __init__(self, x, y):
-        self.image = COMPUTER_CHAR
-        super(ComputerCharacter, self).__init__(x, y)
+    def get_character_from_char(self, char):
+        assert len(char) == 1, char
+        return self._characters_by_image[char]
 
-    def interact(self, character):
-        return HelpText.LOVE_TEXT.value
+    def _load_characters(self, filename):
+        with open(filename, 'r') as f:
+            chars = yaml.safe_load(f)
 
-
-class BabeCharacter(Character):
-
-    def __init__(self, x, y):
-        self.image = BABE_CHAR
-        super(BabeCharacter, self).__init__(x, y)
-
-    def interact(self, character):
-        return HelpText.BABE_TEXT.value
+        for yaml_name, entry in chars.items():
+            if yaml_name == 'main_character':
+                self._characters_by_image[entry['image']] = MainCharacter(entry)
+            else:
+                self._characters_by_image[entry['image']] = Character(entry)
 
 
-class Fake(Character):
-
-    COLLISION_LIST = []
-
-    def __init__(self, x, y):
-        self.image = SPACE_CHAR
-        super(Fake, self).__init__(x, y)
-
-# collisions
-
-Wall.COLLISION_LIST = [MainCharacter]
-MainCharacter.COLLISION_LIST = [BabeCharacter, Wall]
-BabeCharacter.COLLISION_LIST = [MainCharacter]
-
-# string character definitions
-SPACE_CHAR = ' '
-WALL_CHAR = 'X'
-MC_CHAR = '@'
-COMPUTER_CHAR = '='
-BABE_CHAR = '&'
-
-# mapping
-CHAR_TO_CHARACTER_MAPPING = {SPACE_CHAR: Space,
-                             WALL_CHAR: Wall,
-                             MC_CHAR: MainCharacter,
-                             COMPUTER_CHAR: ComputerCharacter,
-                             BABE_CHAR: BabeCharacter}
+CHARACTERS = Characters()

@@ -1,30 +1,42 @@
 from coordinate import Coordinate
 from errors import GameError
-from text import HelpText
-
+from text import InfoText
 
 class Positionable:
 
     COLLISION_LIST = []
 
-    def __init__(self, x, y):
-        self._coordinate = Coordinate(x, y)
+    def __init__(self, entry):
+        self._coordinate = Coordinate(None, None)
         self._coordinate_history = [self._coordinate]
         self._attempted_coordinate_history = [self._coordinate]
+        self.name = entry['name']
+        self.image = entry['image']
+        self._collision_list = entry['collision']
+        self._id = entry['id']
+        self._help_text = InfoText(entry['text'], entry['text_priority'])
+
+    def interact(self, command):
+        print(self._help_text)
+        return self._help_text
+
+    @property
+    def collisions(self):
+        return self._collision_list
 
     def collides(self, positionable):
-        if type(self) in positionable.COLLISION_LIST:
+        if self._id in positionable.collisions:
             he_thinks_i_collide = True
         else:
             he_thinks_i_collide = False
 
-        if type(positionable) in self.COLLISION_LIST:
+        if positionable._id in self.collisions:
             i_think_he_collides = True
         else:
             i_think_he_collides = False
 
         if i_think_he_collides != he_thinks_i_collide:
-            raise GameError("Improper Collision Settings.")
+            raise GameError("Improper Collision Settings for self {} and other {}", self._id, positionable._id)
 
         return i_think_he_collides
 
@@ -40,6 +52,10 @@ class Positionable:
     def x(self):
         return self._coordinate.x
 
+    @x.setter
+    def x(self, val):
+        self._coordinate.x = val
+
     @property
     def last_x(self):
         return self._coordinate_history[-1].x
@@ -47,6 +63,10 @@ class Positionable:
     @property
     def y(self):
         return self._coordinate.y
+
+    @y.setter
+    def y(self, val):
+        self._coordinate.y = val
 
     @property
     def last_y(self):
@@ -61,6 +81,3 @@ class Positionable:
 
     def __repr__(self):
         return "I am {} at {}".format(type(self).__name__, self._coordinate)
-
-    def interact(self, character):
-        return HelpText.NULL_TEXT.value
