@@ -17,7 +17,6 @@ class Positionable:
         self._help_text = InfoText(entry['text'], entry['text_priority'])
 
     def interact(self, command):
-        print(self._help_text)
         return self._help_text
 
     @property

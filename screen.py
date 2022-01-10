@@ -145,7 +145,6 @@ class Screen:
                     character.y = y
 
                     self.grid.apply(Cell.add_positionable, character)
-                    print(character)
                     if isinstance(character, MainCharacter):
                         val = character
         if not val:
