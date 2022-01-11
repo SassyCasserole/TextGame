@@ -3,6 +3,7 @@ from positionable import Coordinate
 from errors import CollisionError, GameError
 from priority_display_queue import PriorityDisplayQueue
 from text import HelpText, LOWEST_PRIORITY
+from command import NullMovementCommand
 
 
 class Cell(Coordinate):
@@ -68,13 +69,21 @@ class Screen:
         self.center_y = NotImplemented
         self.map_height = NotImplemented
         self.map_width = NotImplemented
+        self.characters = set()
 
     def will_collide(self, positionable):
         collides = False
-        for existing_positionable in self.grid[positionable.y][positionable.x].stack:
-            if positionable.collides(existing_positionable):
-                collides = True
-                break
+        try:
+            for existing_positionable in self.grid[positionable.y][positionable.x].stack:
+                if positionable.collides(existing_positionable):
+                    collides = True
+                    break
+        except IndexError as e:
+            print(e)
+            print(positionable.x)
+            print(positionable.y)
+            print(len(self.grid))
+            print(len(self.grid[positionable.y]))
         return collides
 
     def attempt_move(self, positionable, command):
@@ -85,14 +94,22 @@ class Screen:
 
     def move(self, positionable, command):
         self.grid.apply(Cell.remove_positionable, positionable)
-        positionable.command_move(command)
-
+        print("BEF")
+        print(positionable)
+        positionable.commanded_move(command)
+        positionable.move_self()
+        print("AFT")
+        print(positionable)
         if self.will_collide(positionable):
             positionable.undo_move()
             self.grid.apply(Cell.add_positionable, positionable)
             raise CollisionError(positionable)
 
         self.grid.apply(Cell.add_positionable, positionable)
+
+    def update(self):
+        for character in self.characters:
+            self.attempt_move(character, NullMovementCommand())
 
     def get_subset_image(self, width, height):
         half_width = round(width/2)
@@ -145,6 +162,7 @@ class Screen:
                     character.y = y
 
                     self.grid.apply(Cell.add_positionable, character)
+                    self.characters.add(character)
                     if isinstance(character, MainCharacter):
                         val = character
         if not val:
@@ -159,16 +177,19 @@ class Screen:
         return nearby_stack
 
     def use_action(self, character):
+        self.get_help_text(character)
+
+    def get_help_text(self, character):
         current_priority = LOWEST_PRIORITY
         top_interaction = None
 
         nearby_chars = self.get_nearby(character.x, character.y)
 
         for other_character in nearby_chars:
-            interaction = other_character.interact(character)
-            if interaction.priority <= current_priority:
-                current_priority = interaction.priority
-                top_interaction = interaction
+            response = other_character.talk(character)
+            if response.priority <= current_priority:
+                current_priority = response.priority
+                top_interaction = response
 
         self._display_queue.add(top_interaction)
 

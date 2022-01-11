@@ -14,6 +14,7 @@ class State:
     def take_command(self, command):
         self.command_history.append(command)
         self.screen.reset()
+        self.screen.update()
         if isinstance(command, MovementCommand):
             self.screen.attempt_move(self.mc, command)
             self.screen.set_center(self.mc.x, self.mc.y)

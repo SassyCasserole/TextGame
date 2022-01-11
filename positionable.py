@@ -1,6 +1,7 @@
 from coordinate import Coordinate
 from errors import GameError
 from text import InfoText
+from movement import Movement, RandomMovement
 
 class Positionable:
 
@@ -14,10 +15,25 @@ class Positionable:
         self.image = entry['image']
         self._collision_list = entry['collision']
         self._id = entry['id']
+        self._movement = self.set_movement(entry)
         self._help_text = InfoText(entry['text'], entry['text_priority'])
 
-    def interact(self, command):
+    def set_movement(self, entry):
+        try:
+            movement_dict = entry['movement']
+        except KeyError:
+            movement = Movement()
+        else:
+            movement = RandomMovement(movement_dict)
+
+        return movement
+
+    def talk(self, command):
         return self._help_text
+
+    @property
+    def id(self):
+        return self._id
 
     @property
     def collisions(self):
@@ -29,13 +45,13 @@ class Positionable:
         else:
             he_thinks_i_collide = False
 
-        if positionable._id in self.collisions:
+        if positionable.id in self.collisions:
             i_think_he_collides = True
         else:
             i_think_he_collides = False
 
         if i_think_he_collides != he_thinks_i_collide:
-            raise GameError("Improper Collision Settings for self {} and other {}", self._id, positionable._id)
+            raise GameError("Improper Collision Settings for self {} and other {}", self.id, positionable._id)
 
         return i_think_he_collides
 
@@ -46,6 +62,17 @@ class Positionable:
         self._coordinate = Coordinate(new_x, new_y)
         self._coordinate_history.append(self._coordinate)
         self._attempted_coordinate_history.append(self._coordinate)
+
+    def commanded_move(self, command):
+        pass
+
+    def move_self(self):
+        self.accept_movement()
+
+    def accept_movement(self):
+        x, y = self._movement.get_next(self.x, self.y)
+        self.x = x
+        self.y = y
 
     @property
     def x(self):
@@ -79,4 +106,4 @@ class Positionable:
         self._attempted_coordinate_history.append(self._coordinate)
 
     def __repr__(self):
-        return "I am {} at {}".format(type(self).__name__, self._coordinate)
+        return "I am {} look like {} ID {} at {}".format(type(self).__name__, self.image, self._id, self._coordinate)

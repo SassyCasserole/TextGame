@@ -4,7 +4,7 @@ from positionable import Positionable
 
 class Character(Positionable):
 
-    def command_move(self, command):
+    def commanded_move(self, command):
         self.move(command.offset_x, command.offset_y)
 
 

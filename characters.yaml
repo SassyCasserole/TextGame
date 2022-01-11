@@ -7,6 +7,8 @@ main_character:
     - 2
     - 3
     - 5
+    - 6
+    - 7
   id: 1
 
 computer:
@@ -18,6 +20,8 @@ computer:
     - 1
     - 3
     - 5
+    - 6
+    - 7
   id: 2
 
 wall:
@@ -29,6 +33,8 @@ wall:
     - 1
     - 2
     - 5
+    - 6
+    - 7
   id: 3
 
 space:
@@ -49,4 +55,39 @@ babe:
     - 1
     - 2
     - 3
+    - 6
+    - 7
   id: 5
+
+box:
+  name: Box
+  text: 'Look, its a '
+  text_priority: 50
+  image: 'N'
+  collision:
+    - 1
+    - 2
+    - 3
+    - 5
+    - 7
+  id: 6
+
+
+cat:
+  name: Cat
+  text: 'Meow!'
+  text_priority: 30
+  image: 'C'
+  collision:
+    - 1
+    - 2
+    - 3
+    - 5
+    - 6
+  movement:
+    type: random
+    limits:
+      x: 5
+      y: 5
+    speed: 20
+  id: 7

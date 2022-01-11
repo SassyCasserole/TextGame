@@ -25,6 +25,14 @@ class MovementCommand(Command):
         super(MovementCommand, self).__init__()
 
 
+class NullMovementCommand(Command):
+
+    def __init__(self):
+        super(NullMovementCommand, self).__init__()
+        self.offset_x = 0
+        self.offset_y = 0
+
+
 class UpCommand(MovementCommand):
 
     def __init__(self):
