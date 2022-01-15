@@ -79,11 +79,7 @@ class Screen:
                     collides = True
                     break
         except IndexError as e:
-            print(e)
-            print(positionable.x)
-            print(positionable.y)
-            print(len(self.grid))
-            print(len(self.grid[positionable.y]))
+            pass
         return collides
 
     def attempt_move(self, positionable, command):
@@ -94,12 +90,10 @@ class Screen:
 
     def move(self, positionable, command):
         self.grid.apply(Cell.remove_positionable, positionable)
-        print("BEF")
-        print(positionable)
+
         positionable.commanded_move(command)
         positionable.move_self()
-        print("AFT")
-        print(positionable)
+
         if self.will_collide(positionable):
             positionable.undo_move()
             self.grid.apply(Cell.add_positionable, positionable)

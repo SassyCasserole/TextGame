@@ -1,7 +1,7 @@
 from coordinate import Coordinate
-from errors import GameError
 from text import InfoText
-from movement import Movement, RandomMovement
+from movement import Movement, RandomMovement, PaceMovement
+
 
 class Positionable:
 
@@ -13,19 +13,35 @@ class Positionable:
         self._attempted_coordinate_history = [self._coordinate]
         self.name = entry['name']
         self.image = entry['image']
-        self._collision_list = entry['collision']
+        self._type = entry['type']
+        self._type_info = entry['type_info']
+        if self._type_info['collision_types'][0] == 'all':
+            self._short_circuit_all_collides = True
+        else:
+            self._short_circuit_all_collides = False
+
+        if self._type_info['collision_types'][0] == 'none':
+            self._short_circuit_none_collides = True
+        else:
+            self._short_circuit_none_collides = False
+
         self._id = entry['id']
-        self._movement = self.set_movement(entry)
+        self._movement = self.get_movement(entry)
         self._help_text = InfoText(entry['text'], entry['text_priority'])
 
-    def set_movement(self, entry):
+    @staticmethod
+    def get_movement(entry):
         try:
             movement_dict = entry['movement']
         except KeyError:
             movement = Movement()
         else:
-            movement = RandomMovement(movement_dict)
-
+            if movement_dict['type'] == 'random':
+                movement = RandomMovement(movement_dict)
+            elif movement_dict['type'] == 'pace':
+                movement = PaceMovement(movement_dict)
+            else:
+                movement = None
         return movement
 
     def talk(self, command):
@@ -37,23 +53,23 @@ class Positionable:
 
     @property
     def collisions(self):
-        return self._collision_list
+
+        return
+
+    def _i_collide(self, their_type):
+        if self._short_circuit_none_collides:
+            return False
+        elif self._short_circuit_all_collides:
+            return True
+        else:
+            return their_type in self._type_info['collision_types']
+
+    @property
+    def type(self):
+        return self._type
 
     def collides(self, positionable):
-        if self._id in positionable.collisions:
-            he_thinks_i_collide = True
-        else:
-            he_thinks_i_collide = False
-
-        if positionable.id in self.collisions:
-            i_think_he_collides = True
-        else:
-            i_think_he_collides = False
-
-        if i_think_he_collides != he_thinks_i_collide:
-            raise GameError("Improper Collision Settings for self {} and other {}", self.id, positionable._id)
-
-        return i_think_he_collides
+        return self._i_collide(positionable.type)
 
     def undo_move(self):
         self._coordinate_history.pop()

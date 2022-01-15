@@ -1,0 +1,30 @@
+terrain:
+  collision_types:
+    - 'all'
+
+
+
+playable:
+  collision_types:
+    - 'terrain'
+    - 'playable'
+    - 'structures'
+    - 'npc'
+
+npc:
+  collision_types:
+    - 'terrain'
+    - 'playable'
+    - 'structures'
+    - 'npc'
+
+
+item:
+  collision_types:
+    - 'npc'
+    - 'terrain'
+    - 'structures'
+
+void:
+  collision_types:
+    - 'none'
