@@ -88,7 +88,7 @@ class Path:
         self.speed = speed
         self._direction = PathDirection.FORWARD
         self._recent = []
-        self._max_len_recent = 5
+        self._max_len_recent = None
 
     def _get_next(self, pos):
         if self._direction == PathDirection.FORWARD:
@@ -104,22 +104,24 @@ class Path:
             self._direction = PathDirection.FORWARD
 
     def _is_stuck(self, pos):
-        self._recent.append(pos)
-        if len(self._recent) >= self._max_len_recent:
-            # shift
-            self._recent = self._recent[1:-1]
-
-            self._recent.append(pos)
-        print(self._direction)
-        print(self._recent)
-
         for recent_pos in self._recent:
             if recent_pos == pos:
                 return True
             else:
                 return False
 
+    def _update_recent(self, pos):
+        self._recent.append(pos)
+        if not self._max_len_recent:
+            self._max_len_recent = round(float(self.maximum - self.minimum)/float(3))
+        if len(self._recent) >= self._max_len_recent:
+            # shift in new value
+            self._recent = self._recent[1:-1]
+
+            self._recent.append(pos)
+
     def get_next(self, pos):
+        self._update_recent(pos)
         new_pos = self._get_next(pos)
         if new_pos >= self.maximum or new_pos <= self.minimum or self._is_stuck(new_pos):
             self._toggle_direction()
