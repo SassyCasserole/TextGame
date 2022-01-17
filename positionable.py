@@ -25,7 +25,6 @@ class Positionable:
         else:
             self._short_circuit_none_collides = False
 
-        self._id = entry['id']
         self._movement = self.get_movement(entry)
         self._help_text = InfoText(entry['text'], entry['text_priority'])
 
@@ -46,10 +45,6 @@ class Positionable:
 
     def talk(self, command):
         return self._help_text
-
-    @property
-    def id(self):
-        return self._id
 
     @property
     def collisions(self):
@@ -122,4 +117,4 @@ class Positionable:
         self._attempted_coordinate_history.append(self._coordinate)
 
     def __repr__(self):
-        return "I am {} look like {} ID {} at {}".format(type(self).__name__, self.image, self._id, self._coordinate)
+        return "I am {} look like {} at {}".format(type(self).__name__, self.image, self._coordinate)

@@ -2,7 +2,9 @@ terrain:
   collision_types:
     - 'all'
 
-
+void:
+  collision_types:
+    - 'none'
 
 playable:
   collision_types:
@@ -17,14 +19,18 @@ npc:
     - 'playable'
     - 'structures'
     - 'npc'
-
+    - 'event'
 
 item:
   collision_types:
     - 'npc'
     - 'terrain'
     - 'structures'
+    - 'event'
 
-void:
+event:
   collision_types:
-    - 'none'
+    - 'npc'
+    - 'terrain'
+    - 'structures'
+    - 'item'

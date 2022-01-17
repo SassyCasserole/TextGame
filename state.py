@@ -1,28 +1,36 @@
 from user import User
-from screen import Screen
+from overworld import Overworld
 from command import MovementCommand, UseCommand
 
 
 class State:
 
     def __init__(self):
-        self.user = User()
-        self.screen = Screen()
-        self.mc = None
         self.command_history = []
+        self.overworld = Overworld()
+        self.user = User()
 
     def take_command(self, command):
         self.command_history.append(command)
-        self.screen.reset()
-        self.screen.update()
+        self.overworld.current_screen.reset()
+        self.overworld.current_screen.update()
+
         if isinstance(command, MovementCommand):
-            self.screen.attempt_move(self.mc, command)
-            self.screen.set_center(self.mc.x, self.mc.y)
+            self.overworld.current_screen.attempt_move(self.overworld.mc, command)
+            self.overworld.current_screen.set_center(self.overworld.mc.x, self.overworld.mc.y)
         elif isinstance(command, UseCommand):
-            self.screen.use_action(self.mc)
+            self.overworld.current_screen.use_action(self.overworld.mc)
         else:
             pass
 
-    def add_map(self, lines):
-        self.mc = self.screen.add_map(lines)
-        self.screen.set_center(self.mc.x, self.mc.y)
+    def update(self):
+        self.overworld.current_screen.draw()
+        self.user.get_input()
+        input_command = self.user.input_command
+        input_command.executive_action()
+
+        if input_command:
+            self.take_command(input_command)
+        else:
+            pass
+

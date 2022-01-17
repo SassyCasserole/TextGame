@@ -22,7 +22,9 @@ class Characters:
 
     def get_character_from_char(self, char):
         assert len(char) == 1, char
-        return self._characters_by_image[char]
+        character_info_list = self._characters_by_image[char]
+        character = character_info_list[0](character_info_list[1])
+        return character
 
     def _load_characters(self, char_filename, types_filename):
         with open(char_filename, 'r') as f:
@@ -42,9 +44,9 @@ class Characters:
             entry['type_info'] = this_char_type_info
 
             if yaml_name == 'main_character':
-                self._characters_by_image[entry['image']] = MainCharacter(entry)
+                self._characters_by_image[entry['image']] = [MainCharacter, entry]
             else:
-                self._characters_by_image[entry['image']] = Character(entry)
+                self._characters_by_image[entry['image']] = [Character, entry]
 
 
 CHARACTERS = Characters()

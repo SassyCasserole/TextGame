@@ -13,9 +13,14 @@ class Cell(Coordinate):
         super().__init__(x, y)
 
     def add_positionable(self, character):
+        assert character.x == self.x
+        assert character.y == self.y
         self.stack.append(character)
 
     def remove_positionable(self, character):
+        assert character.x == self.x
+        assert character.y == self.y
+
         self.stack.remove(character)
 
     def remove_top(self):
@@ -124,7 +129,7 @@ class Screen:
         return self.grid.get_image(min_x, max_x, min_y, max_y)
 
     def get_current_image(self):
-        return self.get_subset_image(50, 20)
+        return self.get_subset_image(45, 18)
 
     def set_center(self, x, y):
         self.center_x = x
@@ -135,13 +140,13 @@ class Screen:
         print(self._display_queue.highest().text)
 
     def add_map(self, lines):
-        val = None
+        main_character = None
         # make a grid big enough
         # assumed to be rectangular
         self.map_height = len(lines)
         self.map_width = len(lines[0])
         for i in range(0, self.map_height):
-            row = Row([Cell(i, j) for j in range(0, self.map_width)])
+            row = Row([Cell(j, i) for j in range(0, self.map_width)])
             self.grid.append(row)
 
         # instantiate objects within cells
@@ -158,10 +163,12 @@ class Screen:
                     self.grid.apply(Cell.add_positionable, character)
                     self.characters.add(character)
                     if isinstance(character, MainCharacter):
-                        val = character
-        if not val:
-            raise GameError("No Main Character")
-        return val
+                        # if already defined
+                        if main_character:
+                            raise GameError("More than one main character.")
+                        main_character = character
+
+        return main_character
 
     def get_nearby(self, x, y):
         nearby_stack = []
