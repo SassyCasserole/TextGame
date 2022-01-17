@@ -119,6 +119,13 @@ grey:
     speed: 100
     limit: 8
 
+bed:
+  name: "Cas's Bed"
+  type: 'npc'
+  text: 'What a comfy bed...'
+  text_priority: 30
+  image: '-'
+
 teleporter:
   name: Teleport
   type: 'event'
